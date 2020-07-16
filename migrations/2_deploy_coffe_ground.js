@@ -2,7 +2,7 @@ const fs = require('fs');
 const CoffeeGround = artifacts.require("./CoffeeGround.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(CoffeeGround, {overwrite: false}).then(() => {
+  deployer.deploy(CoffeeGround, {overwrite: true}).then(() => {
     fs.writeFile(
       'metadata/CoffeeGround',
       JSON.stringify(CoffeeGround._json, 2), 

@@ -12,15 +12,34 @@ const secret = fs.readFileSync(path.join(APP_ROOT_DIR, '.secret.json'));
 const parsedSecret = JSON.parse(secret);
 const caver = new Caver(parsedSecret.baobab.url);
 const contract = require(path.join(APP_ROOT_DIR, 'config/contract'));
+const caverWs = new Caver(parsedSecret.baobab.websocketUrl);
+const contractWs = require(path.join(APP_ROOT_DIR, 'config/contract'));
 const GAS_LIMIT = 300000;
 
 const coffeeGround = contract.coffeeGround;
+const coffeeGroundWs = contractWs.coffeeGround;
 
 const d = parsedSecret.baobab.accounts.deployer;
 const deployer = caver.klay.accounts.wallet.add(d.privateKey);
 
 app.use(bodyParsre.urlencoded({ extended: false }));
 app.use(bodyParsre.json());
+
+app.get('/total-transaction', (req, res) => {
+  coffeeGroundWs.getPastEvents('AddDonation', {
+    fromBlock: 0,
+    toBlock: 'latest'
+  }, (error, events) => {
+  }).then(events => {
+    return res.json({
+      totalTransaction: events.length,
+    });
+  }).catch(error => {
+    return res.status(500).json({
+      msg: error,
+    });
+  });
+});
 
 app.get('/coffee-ground/:cafeId', (req, res) => {
   cfid = req.params.cafeId;
